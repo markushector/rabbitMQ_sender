@@ -62,7 +62,7 @@ type BasicTrade struct {
 	Side         float64 	`json:"Side"`
 	SecurityId   string 	`json:"SecurityId"`
 	TransactTime string 	`json:"TransactTime"`
-	AvgPrice     string 	`json:"AvPrice"`
+	AvgPrice     float64 	`json:"AvPrice"`
 	ClOrdId      string 	`json:"ClOrdId"`
 	OrderId      string 	`json:"OrderId"`
 	Currency     string 	`json:"Currency"`
@@ -85,7 +85,6 @@ func main () {
 			order := &BasicTrade{Side: 1,
 				SecurityId:   "DE0007100000",
 				TransactTime: "2022-03-29 14:47:27.698",
-				AvgPrice:     "undefined",
 				ClOrdId:      "ec01b8fb-4301-4bd5-aab3-bedf45e42bb5",
 				OrderId:      "63314325",
 				Currency:     "EUR",
