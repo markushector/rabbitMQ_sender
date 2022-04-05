@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/streadway/amqp"
 	"log"
+	"encoding/json"
 )
 
 func failOnError(err error, msg string) {
@@ -19,7 +20,7 @@ func ConnectToRabbitMQ(path string) *amqp.Connection {
 	return conn
 }
 
-func SendMessage(mess string, queue string) {
+func SendMessage(mess []byte, queue string) {
 
 	conn := ConnectToRabbitMQ("amqp://guest:guest@localhost:5672/")
 
@@ -46,23 +47,52 @@ func SendMessage(mess string, queue string) {
 		false,  // mandatory
 		false,  // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
+			ContentType: "application/json",
 			Body:        []byte(mess),
 		})
 	failOnError(err, "Failed to publish a message")
 }
 
-func main() {
-	var status bool = true
+type User struct {
+    Name string
+		Age int32
+}
+
+type BasicTrade struct {
+	Side         float64 	`json:"Side"`
+	SecurityId   string 	`json:"SecurityId"`
+	TransactTime string 	`json:"TransactTime"`
+	AvgPrice     string 	`json:"AvPrice"`
+	ClOrdId      string 	`json:"ClOrdId"`
+	OrderId      string 	`json:"OrderId"`
+	Currency     string 	`json:"Currency"`
+	Order_qty    float64	`json:"Order_qty"`
+	ExecType     string 	`json:"ExecType"`
+}
+
+func main () {
+
+	status := true
 	for status {
 		var mess string
-		fmt.Println("Input your message (quit to exit): ")
+		fmt.Println("Send order y/n (quit to exit): ")
 		fmt.Scan(&mess)
+
 		if mess == "quit" {
 			status = false
 			break
 		} else {
-			SendMessage(mess, "nyqueue")
+			order := &BasicTrade{Side: 1,
+				SecurityId:   "DE0007100000",
+				TransactTime: "2022-03-29 14:47:27.698",
+				AvgPrice:     "undefined",
+				ClOrdId:      "ec01b8fb-4301-4bd5-aab3-bedf45e42bb5",
+				OrderId:      "63314325",
+				Currency:     "EUR",
+				Order_qty:    0.29,
+				ExecType:     "A"}
+			mess, _ := json.Marshal(order)
+			SendMessage(mess, "orders")
 		}
 	}
 }
